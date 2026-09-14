@@ -143,7 +143,6 @@ footer{
       <h2>Pilih mata pelajaran</h2>
       <div class="hint">Taip nama subjek untuk mencari. Tidak semua subjek perlu dipaparkan serentak.</div>
     </div>
-    <div class="count"><span id="subjectCount">119</span> subjek tersedia • <span id="programCount">363</span> program dalam katalog • <span id="autoProgramCount">358</span> tapisan automatik</div>
   </div>
 
   <div class="selector">
@@ -204,9 +203,6 @@ const byId = Object.fromEntries(subjects.map(s=>[s.id,s]));
 const selected = new Set();
 const commonIds = ["sains","bio","fizik","kimia","addmath","sainskomputer","pka","pkm","pkee","lukisankejuruteraan","pertanian","keusahawanan","pendidikanislam","pqs","psi","arab","hifz","maharat","akaun","ekonomi"];
 
-document.getElementById("subjectCount").textContent=subjects.length;
-document.getElementById("programCount").textContent=catalog.length;
-const autoProgramCountEl=document.getElementById("autoProgramCount"); if(autoProgramCountEl) autoProgramCountEl.textContent=catalog.filter(c=>c.auto===true).length;
 
 function norm(s){
   return (s||"").toLowerCase()
