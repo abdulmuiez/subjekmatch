@@ -180,7 +180,7 @@ footer{
   <div class="grid" id="courseGrid"></div>
 
   <div class="note">
-      <strong>Nota penting:</strong> SubjekMatch kini menggunakan tapisan syarat mata pelajaran yang lebih ketat. Jika kombinasi subjek tidak mencukupi, program tersebut tidak dipaparkan.
+      <strong>Nota penting:</strong> SubjekMatch mengenal pasti Pakej STEM A, STEM B dan STEM C berdasarkan kombinasi mata pelajaran, termasuk Sains Komputer, subjek teknikal dan MPV/PVMA. Program yang memerlukan subjek wajib seperti Biologi atau Bahasa Arab akan disembunyikan jika subjek itu tidak diambil.
       Ini masih bukan pengesahan kelayakan kemasukan kerana gred, merit, temu duga, MUET dan syarat khas universiti belum dinilai.
       Semak kelayakan akhir melalui ePanduan UPU dan laman rasmi universiti.
     </div>
@@ -193,7 +193,7 @@ footer{
 <footer>
       <strong>SubjekMatch</strong><br>
       Dibangunkan oleh Unit Bimbingan dan Kaunseling, SMK Sungai Besar<br>
-      <span style="font-size:12px">Katalog semasa: 363 program Kategori A sesi 2026/2027 daripada pangkalan data UPUMatch. 358 program mempunyai tapisan akademik automatik; 5 rekod yang masih memerlukan semakan khas tidak dipaparkan sebagai padanan automatik. e-Panduan UPU kekal rujukan rasmi. Pakej Sekolah Menengah Teknik dirujuk untuk pengesanan kombinasi subjek.</span>
+      <span style="font-size:12px">Katalog semasa: 363 program Kategori A sesi 2026/2027 daripada pangkalan data UPUMatch. Audit kritikal STEM/teknik/Bahasa Arab dikemas kini 15 September 2026. 358 program mempunyai tapisan akademik automatik; 5 rekod yang masih memerlukan semakan khas tidak dipaparkan sebagai padanan automatik. e-Panduan UPU kekal rujukan rasmi. Pakej Sekolah Menengah Teknik dirujuk untuk pengesanan kombinasi subjek.</span>
     </footer>
 
 <script>
@@ -284,6 +284,51 @@ searchInput.addEventListener("input",()=>renderOptions(searchInput.value));
 // Gred, merit, temu duga, Bumiputera, kesihatan/fizikal dan syarat bukan akademik tidak dinilai di sini.
 const CORE_ASSUMED = new Set(["bm","bi","math","sejarah"]);
 
+// Klasifikasi pakej STEM KPM.
+// STEM A: Fizik + Kimia + Biologi + Matematik Tambahan.
+// STEM B: mana-mana 2 Sains Tulen + Matematik Tambahan + sekurang-kurangnya 1 elektif lain.
+// STEM C(1): sekurang-kurangnya 2 elektif STEM Sains Gunaan & Teknologi.
+// STEM C(2): sekurang-kurangnya 1 mata pelajaran vokasional (MPV/PVMA).
+const PURE_SCIENCE = new Set(["bio","fizik","kimia"]);
+const STEM_APPLIED = new Set([
+  "sainstambahan","gkt","asaskelestarian","pertanian","srt","rekacipta",
+  "sainskomputer","sainsukan","pka","pkm","pkee"
+]);
+const STEM_VOCATIONAL = new Set([
+  "pembinaandomestik","pendawaian","hiasandalaman","kerjapaip","kimpal",
+  "pembuatanperabot","produksirekatanda","servisperalatan","penyejukan",
+  "servisautomobil","servismotosikal","jahitan","katering","penjagaanmuka",
+  "penggayaanrambut","menservis_peralatan_dan_penyaman_udara"
+]);
+
+// Subjek yang dianggap memenuhi komponen Bahasa Arab apabila syarat program memerlukannya.
+const ARABIC_SUBJECTS = new Set([
+  "arab","arabtinggi","arabkomunikasi","lughah","turatharab","adab"
+]);
+
+// Program yang secara jelas memerlukan komponen Bahasa Arab. Kebanyakannya sudah ada
+// gate dalam katalog; senarai ini menjadi lapisan keselamatan supaya program tidak
+// terpapar jika calon langsung tidak mengambil mana-mana subjek Bahasa Arab.
+const REQUIRES_ARABIC_CODES = new Set([
+  "UQ0381001","UE4221001","UD4221001","UD4224001","UD4221005","UD4221002",
+  "UD4221003","UD4221007","UD4221006","UM0221002","UM0221001","UE4146001",
+  "UY0000015","UY0000001"
+]);
+
+// Lapisan keselamatan bagi rekod yang diketahui mempunyai syarat kehadiran subjek
+// tetapi gate asal katalog kosong / tidak lengkap.
+const HARD_REQUIRED_SUBJECTS = {
+  // UIAM: lapisan keselamatan untuk rekod Asasi STEM/kesihatan yang gate asalnya kosong.
+  // Gred tidak dinilai di SubjekMatch; di sini kita hanya semak KEHADIRAN mata pelajaran.
+  "UY0000002":["fizik","kimia","addmath"],                 // Asasi Sains Fizikal
+  "UY0000003":["bio","kimia","fizik"],                  // Asasi Sains Kesihatan Bersekutu
+  "UY0000004":["bio","kimia","fizik"],                  // Asasi Kejururawatan
+  "UY0000005":["bio","kimia","fizik"],                  // Asasi Farmasi
+  "UY0000013":["bio","fizik","kimia","addmath"],      // Asasi Sains Hayat
+  "UY0000019":["bio","kimia","fizik","addmath"],      // Asasi Pergigian
+  "UY0520001":["fizik","kimia","addmath"]               // Asasi Kejuruteraan
+};
+
 function passGate(g,set){
   if(!g) return true;
   if(g.t==="all") return (g.ids||[]).every(x=>set.has(x) || CORE_ASSUMED.has(x));
@@ -305,49 +350,123 @@ function passGate(g,set){
   return false;
 }
 
+function hasAny(set, ids){
+  return (ids||[]).some(x=>set.has(x));
+}
+
+function selectedNames(set, ids){
+  return (ids||[]).filter(x=>set.has(x)).map(x=>(byId[x]?.name||x));
+}
+
+function gateExplicitlyRequiresArabic(g){
+  if(!g) return false;
+  if(g.t==="all") return (g.ids||[]).some(x=>ARABIC_SUBJECTS.has(x));
+  if(g.t==="count"){
+    const ids=g.ids||[];
+    return ids.length>0 && ids.every(x=>ARABIC_SUBJECTS.has(x)) && (g.n||1)>0;
+  }
+  if(g.t==="anysets") return (g.options||[]).length>0 && (g.options||[]).every(opt=>(opt||[]).some(x=>gateExplicitlyRequiresArabic(x)));
+  return false;
+}
+
+function passesHardSubjectGuard(c,set){
+  const hard=HARD_REQUIRED_SUBJECTS[c.code];
+  if(hard && !hard.every(x=>set.has(x) || CORE_ASSUMED.has(x))) return false;
+
+  // Jangan paparkan program yang benar-benar memerlukan Bahasa Arab jika calon
+  // tidak mengambil langsung mana-mana subjek Bahasa Arab yang setara.
+  const nameRequiresArabic=/bahasa arab/i.test(c.name||"");
+  const gateRequiresArabic=(c.gates||[]).some(g=>gateExplicitlyRequiresArabic(g));
+  if((REQUIRES_ARABIC_CODES.has(c.code) || nameRequiresArabic || gateRequiresArabic) && !hasAny(set,[...ARABIC_SUBJECTS])) return false;
+  return true;
+}
+
 function passesSubjectRule(c,sel){
   if(c.auto!==true) return false; // syarat khas belum cukup kukuh untuk tapisan automatik
   const set=new Set(sel);
   if(!(c.rel||[]).some(x=>set.has(x))) return false;
+  if(!passesHardSubjectGuard(c,set)) return false;
   return (c.gates||[]).every(g=>passGate(g,set));
 }
 
+function detectStemPackage(sel){
+  const s=new Set(sel);
+  const pure=[...PURE_SCIENCE].filter(x=>s.has(x));
+  const pureCount=pure.length;
+  const hasAdd=s.has("addmath");
+  const otherElectives=[...s].filter(x=>!PURE_SCIENCE.has(x) && x!=="addmath" && !CORE_ASSUMED.has(x));
+  const applied=[...STEM_APPLIED].filter(x=>s.has(x));
+  const vocational=[...STEM_VOCATIONAL].filter(x=>s.has(x));
+
+  if(pureCount===3 && hasAdd){
+    return {code:"A",label:"Pakej STEM A",detail:"Fizik + Kimia + Biologi + Matematik Tambahan"};
+  }
+  if(pureCount>=2 && hasAdd && otherElectives.length>=1){
+    const track=[];
+    if(s.has("sainskomputer")) track.push("Sains Komputer");
+    if(hasAny(s,["pka","pkm","pkee","lukisankejuruteraan","teknologikejuruteraan"])) track.push("Teknik/Kejuruteraan");
+    const suffix=track.length ? ` · Fokus ${track.join(" + ")}` : "";
+    return {code:"B",label:"Pakej STEM B",detail:`Sekurang-kurangnya 2 Sains Tulen + Matematik Tambahan + sekurang-kurangnya 1 elektif${suffix}`};
+  }
+  if(applied.length>=2){
+    const chosen=selectedNames(s,applied).slice(0,4).join(" + ");
+    return {code:"C1",label:"Pakej STEM C (C1)",detail:`Sekurang-kurangnya 2 elektif STEM Sains Gunaan dan Teknologi${chosen?` · ${chosen}`:""}`};
+  }
+  if(vocational.length>=1){
+    const chosen=selectedNames(s,vocational).slice(0,3).join(" + ");
+    return {code:"C2",label:"Pakej STEM C (C2)",detail:`Sekurang-kurangnya 1 mata pelajaran vokasional (MPV/PVMA)${chosen?` · ${chosen}`:""}`};
+  }
+  if(pureCount>=2 && hasAdd && otherElectives.length===0){
+    return {code:"B_INCOMPLETE",label:"Asas STEM B belum lengkap",detail:"Tambah sekurang-kurangnya 1 lagi mata pelajaran elektif"};
+  }
+  return null;
+}
+
+function detectSmtPackage(sel){
+  const s=new Set(sel);
+  const hasAll=ids=>ids.every(x=>s.has(x));
+  if(hasAll(["pka","lukisankejuruteraan","fizik","kimia","addmath"])) return "Pakej SMT Kejuruteraan Awam";
+  if(hasAll(["pkee","lukisankejuruteraan","fizik","kimia","addmath"])) return "Pakej SMT Kejuruteraan Elektrik & Elektronik";
+  if(hasAll(["pkm","lukisankejuruteraan","fizik","kimia","addmath"])) return "Pakej SMT Kejuruteraan Mekanikal";
+  if(hasAll(["pertanian","bio","fizik","kimia","addmath"])) return "Pakej SMT Sains Pertanian";
+  if(hasAll(["keusahawanan","akaun","fizik","kimia","addmath"])) return "Pakej SMT Perdagangan";
+
+  if(s.has("pka")) return "Subjek teknikal Kejuruteraan Awam SMT dikesan (pakej belum lengkap)";
+  if(s.has("pkee")) return "Subjek teknikal Kejuruteraan Elektrik & Elektronik SMT dikesan (pakej belum lengkap)";
+  if(s.has("pkm")) return "Subjek teknikal Kejuruteraan Mekanikal SMT dikesan (pakej belum lengkap)";
+  return "";
+}
+
 function subjectProfile(sel){
-  const s = new Set(sel);
-  const hasAll = ids => ids.every(x=>s.has(x));
-  let packageName = "";
-  if(hasAll(["pka","lukisankejuruteraan","fizik","kimia","addmath"])) {
-    packageName = "Pakej SMT Kejuruteraan Awam dikesan";
-  } else if(hasAll(["pkee","lukisankejuruteraan","fizik","kimia","addmath"])) {
-    packageName = "Pakej SMT Kejuruteraan Elektrik & Elektronik dikesan";
-  } else if(hasAll(["pkm","lukisankejuruteraan","fizik","kimia","addmath"])) {
-    packageName = "Pakej SMT Kejuruteraan Mekanikal dikesan";
-  } else if(hasAll(["pertanian","bio","fizik","kimia","addmath"])) {
-    packageName = "Pakej SMT Sains Pertanian dikesan";
-  } else if(s.has("akaun") && (s.has("keusahawanan") || s.has("perniagaan") || s.has("perdagangan"))) {
-    packageName = "Subjek utama Perdagangan SMT dikesan";
-  } else if(s.has("pka")) {
-    packageName = "Subjek teknikal Kejuruteraan Awam SMT dikesan (pakej belum lengkap)";
-  } else if(s.has("pkee")) {
-    packageName = "Subjek teknikal Kejuruteraan Elektrik & Elektronik SMT dikesan (pakej belum lengkap)";
-  } else if(s.has("pkm")) {
-    packageName = "Subjek teknikal Kejuruteraan Mekanikal SMT dikesan (pakej belum lengkap)";
+  const s=new Set(sel);
+  const stem=detectStemPackage(sel);
+  const smt=detectSmtPackage(sel);
+  const parts=[];
+
+  if(stem) parts.push(`${stem.label} dikesan (${stem.detail}).`);
+  if(smt) parts.push(`${smt}.`);
+
+  const fullScience=["bio","fizik","kimia","addmath"].every(x=>s.has(x));
+  const physicalScience=["fizik","kimia","addmath"].every(x=>s.has(x));
+  const lifeScience=["bio","kimia","addmath"].every(x=>s.has(x));
+  if(fullScience){
+    parts.push("Asas sains tulen lengkap dikesan.");
+  } else if(physicalScience){
+    parts.push("Asas Sains Fizikal dikesan. Program yang mewajibkan Biologi akan ditapis keluar.");
+  } else if(lifeScience){
+    parts.push("Asas Sains Hayat dikesan. Program yang mewajibkan Fizik akan ditapis keluar.");
+  } else {
+    parts.push("Hanya program yang relevan dan melepasi tapisan kehadiran subjek khas akan dipaparkan.");
   }
 
-  const fullScience = ["bio","fizik","kimia","addmath"].every(x=>s.has(x));
-  const physicalScience = ["fizik","kimia","addmath"].every(x=>s.has(x));
-  const lifeScience = ["bio","kimia","addmath"].every(x=>s.has(x));
-  let scienceText;
-  if(fullScience){
-    scienceText = "Asas subjek sains lengkap dikesan (Biologi + Fizik + Kimia + Matematik Tambahan).";
-  } else if(physicalScience){
-    scienceText = "Asas Sains Fizikal dikesan (Fizik + Kimia + Matematik Tambahan). Program yang benar-benar memerlukan Biologi akan ditapis keluar.";
-  } else if(lifeScience){
-    scienceText = "Asas Sains Hayat dikesan (Biologi + Kimia + Matematik Tambahan). Program yang benar-benar memerlukan Fizik akan ditapis keluar.";
+  if(hasAny(s,[...ARABIC_SUBJECTS])){
+    parts.push("Komponen Bahasa Arab dikesan; program yang memerlukan Bahasa Arab boleh dipertimbangkan dari sudut kehadiran subjek.");
   } else {
-    scienceText = "Hanya program yang relevan dan melepasi tapisan kehadiran subjek khas akan dipaparkan.";
+    parts.push("Tiada subjek Bahasa Arab dikesan; program yang mewajibkan Bahasa Arab akan disembunyikan.");
   }
-  return (packageName ? packageName + ". " : "") + scienceText + " Bahasa Melayu, Bahasa Inggeris, Matematik dan Sejarah dianggap subjek teras SPM; gred dan merit belum dinilai.";
+
+  parts.push("Bahasa Melayu, Bahasa Inggeris, Matematik dan Sejarah dianggap subjek teras SPM; gred, merit dan syarat bukan akademik belum dinilai.");
+  return parts.join(" ");
 }
 
 function scoreCourse(c,sel){
