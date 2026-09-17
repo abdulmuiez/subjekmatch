@@ -201,7 +201,7 @@ footer{
 <footer>
       <strong>SubjekMatch</strong><br>
       Dibangunkan oleh Unit Bimbingan dan Kaunseling, SMK Sungai Besar<br>
-      <span style="font-size:12px">Versi Deploy Ready · 17 September 2026. Katalog semasa mengandungi 363 program Kategori A daripada pangkalan data UPUMatch. SubjekMatch menapis berdasarkan mata pelajaran yang diambil, bukan gred, merit, MUET, temu duga atau syarat bukan akademik. Hasil dibahagikan kepada Padanan Utama, laluan Berdasarkan Subjek Anda, dan Open-stream. Gate merentas aliran hanya dibuka apabila elektif bukan-teras calon benar-benar terlibat dalam gate yang dipetakan, manakala 96 program open-stream telah diaudit sebagai tidak menetapkan elektif bukan-teras tertentu. Empat rekod kekal manual/provisional dan tidak digunakan untuk keputusan automatik. Semakan kelayakan akhir hendaklah dibuat melalui e-Panduan UPU dan laman rasmi institusi.</span>
+      <span style="font-size:12px">Versi Final Locked · 17 September 2026. Katalog semasa mengandungi 363 program Kategori A daripada pangkalan data UPUMatch. SubjekMatch menapis berdasarkan mata pelajaran yang diambil, bukan gred, merit, MUET, temu duga atau syarat bukan akademik. Hasil dibahagikan kepada Padanan Utama, laluan Berdasarkan Subjek Anda, dan Open-stream. Gate merentas aliran hanya dibuka apabila elektif bukan-teras calon benar-benar terlibat dalam gate yang dipetakan, manakala 96 program open-stream telah diaudit sebagai tidak menetapkan elektif bukan-teras tertentu. Empat rekod kekal manual/provisional dan tidak digunakan untuk keputusan automatik. Semakan kelayakan akhir hendaklah dibuat melalui e-Panduan UPU dan laman rasmi institusi.</span>
     </footer>
 
 <script>
@@ -809,6 +809,7 @@ function matchCourses(){
     document.getElementById("profileName").textContent="Belum ada subjek dipilih";
     document.getElementById("profileText").textContent="Pilih sekurang-kurangnya satu mata pelajaran.";
     document.getElementById("countText").textContent="";
+    document.getElementById("filterBar").innerHTML="";
     grid.innerHTML='<div class="empty">Tiada padanan untuk dipaparkan.</div>';
     document.getElementById("result").scrollIntoView({behavior:"smooth"});
     return;
@@ -896,10 +897,13 @@ function renderFilters(matches){
 
 function resetAll(){
   selected.clear();searchInput.value="";renderChips();renderOptions();
+  document.getElementById("filterBar").innerHTML="";
+  document.getElementById("countText").textContent="";
+  document.getElementById("courseGrid").innerHTML="";
   document.getElementById("result").style.display="none";
 }
 renderOptions();renderChips();
-window.SUBJEKMATCH_RELEASE={version:"deploy-ready-2026-09-17",status:"deploy-ready",auditSource:"UPUMatch v5.2.1",hardReadySource:358,autoPrograms:359,manualPrograms:4,totalPrograms:363,verifiedOpenStreamPrograms:96,openStreamManualChecks:39,qa:{critical:26,uiScenarios:4,monotonicity:30000,monotonicityFailures:0},focus:"deploy-ready after final structural, profile, guard, UI-render and cross-stream regression audits"};
+window.SUBJEKMATCH_RELEASE={version:"final-locked-2026-09-17",status:"final-locked",auditSource:"UPUMatch v5.2.1",hardReadySource:358,autoPrograms:359,manualPrograms:4,totalPrograms:363,verifiedOpenStreamPrograms:96,openStreamManualChecks:39,qa:{critical:26,uiScenarios:4,monotonicity:30000,monotonicityFailures:0},focus:"final locked after last user-flow audit; stale result filters cleared on empty/reset states"};
 </script>
 </body>
 </html>
