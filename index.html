@@ -87,7 +87,7 @@ footer{color:#776a52}
 .filterBtn{border:1px solid #e1d4b7;background:#fff;color:#4b5870;padding:8px 12px;border-radius:999px;font-size:13px;font-weight:800;cursor:pointer}
 .filterBtn:hover{border-color:#d5a01a;background:#fff9e8}
 .filterBtn.active{background:var(--navy);border-color:var(--navy);color:#fff}
-.course.hidden{display:none}
+.course.hidden,.crossGroup.hidden{display:none}
 
 
 
@@ -122,6 +122,9 @@ footer{
 
 
 .gradeNote{margin-top:8px;padding:8px 10px;border-radius:9px;background:#f7f9fc;border:1px solid #e5eaf0;color:#4b5b6a;font-size:.75rem;line-height:1.45}.gradeNote strong{color:#314152}
+.specialOption{margin-top:16px;padding:13px 15px;border:1px solid #e6d7ad;background:#fffaf0;border-radius:12px;color:#4b5870;font-size:13px;line-height:1.45}
+.specialOption label{display:flex;gap:10px;align-items:flex-start;cursor:pointer}.specialOption input{margin-top:3px;width:18px;height:18px;accent-color:var(--primary)}
+.specialOption strong{color:var(--navy)}.specialOption span{display:block;color:#6d7788;margin-top:2px}
 </style>
 </head>
 <body>
@@ -165,6 +168,15 @@ footer{
     </div>
   </div>
 
+  <div class="specialOption">
+    <label>
+      <input id="huffazFlag" type="checkbox">
+      <div><strong>Syarat khas Huffaz (jika berkenaan)</strong><span>Saya menghafaz al-Quran sekurang-kurangnya Juzuk 1 hingga Juzuk 5. Pilihan ini digunakan untuk Asasi Teknologi Maklumat Huffaz UMK; temu duga masih diperlukan.</span></div>
+    </label>
+  </div>
+
+  <div class="specialOption"><strong>Nota UniSZA:</strong> Beberapa program UniSZA yang bukan bernama “Pengajian Islam” tetap mensyaratkan sekurang-kurangnya satu subjek Pengajian Islam/Bahasa Arab pada peringkat SPM. Jika anda tidak mengambil subjek tersebut, program berkenaan akan ditapis keluar.</div>
+
   <div class="actions">
     <button class="btn primary" onclick="matchCourses()">🔎 Teroka Hala Tuju Saya</button>
     <button class="btn secondary" onclick="resetAll()">Kosongkan</button>
@@ -201,7 +213,7 @@ footer{
 <footer>
       <strong>SubjekMatch</strong><br>
       Dibangunkan oleh Unit Bimbingan dan Kaunseling, SMK Sungai Besar<br>
-      <span style="font-size:12px">Versi Final Locked · 17 September 2026. Katalog semasa mengandungi 363 program Kategori A daripada pangkalan data UPUMatch. SubjekMatch menapis berdasarkan mata pelajaran yang diambil, bukan gred, merit, MUET, temu duga atau syarat bukan akademik. Hasil dibahagikan kepada Padanan Utama, laluan Berdasarkan Subjek Anda, dan Open-stream. Gate merentas aliran hanya dibuka apabila elektif bukan-teras calon benar-benar terlibat dalam gate yang dipetakan, manakala 96 program open-stream telah diaudit sebagai tidak menetapkan elektif bukan-teras tertentu. Empat rekod kekal manual/provisional dan tidak digunakan untuk keputusan automatik. Semakan kelayakan akhir hendaklah dibuat melalui e-Panduan UPU dan laman rasmi institusi.</span>
+      <span style="font-size:12px">Versi Audit Agama/Huffaz · 19 September 2026. Katalog semasa mengandungi 363 program Kategori A daripada pangkalan data UPUMatch. SubjekMatch menapis berdasarkan mata pelajaran yang diambil, bukan gred, merit, MUET, temu duga atau syarat bukan akademik. Hasil dibahagikan kepada Padanan Utama, laluan Berdasarkan Subjek Anda, dan Open-stream. Gate merentas aliran hanya dibuka apabila elektif bukan-teras calon benar-benar terlibat dalam gate yang dipetakan, manakala 96 program open-stream telah diaudit sebagai tidak menetapkan elektif bukan-teras tertentu. Empat rekod kekal manual/provisional dan tidak digunakan untuk keputusan automatik. Semakan kelayakan akhir hendaklah dibuat melalui e-Panduan UPU dan laman rasmi institusi.</span>
     </footer>
 
 <script>
@@ -258,6 +270,29 @@ Object.assign(PROGRAM_RELEVANCE_OVERRIDES,{
 });
 
 catalog.forEach(c=>{ if(PROGRAM_RELEVANCE_OVERRIDES[c.code]) c.rel = PROGRAM_RELEVANCE_OVERRIDES[c.code]; });
+
+// v30 AUDIT AGAMA/HUFFAZ - 19 Sep 2026
+// Pembetulan berasaskan semakan syarat rasmi/terkini yang dapat disahkan:
+// - UniSZA Diploma Sains Komputer/IT: syarat rasmi 2026 membenarkan Matematik Tambahan ATAU satu subjek Islam/Arab bagi kumpulan syarat kedua.
+// - Senarai setara Islam/Arab dikekalkan untuk mengurangkan false negative pada nama subjek lama/setara.
+// - UniSZA Diploma Media Penyiaran Islam: perlu Bahasa Arab + Matematik + Sains + 2 subjek Pengajian Islam.
+const PROGRAM_GATE_CORRECTIONS = {
+  "UD4481003":[
+    {t:"count",ids:["math","addmath"],n:1},
+    {t:"count",ids:["addmath","pendidikanislam","psi","pqs","tasawur","arab","arabtinggi","arabkomunikasi","usulaldin","alsyariah","manahij","adab","hifz","maharat","lughah","turatharab","turathquran","turathdirasat"],n:1}
+  ],
+  "UD4482001":[
+    {t:"count",ids:["math","addmath"],n:1},
+    {t:"count",ids:["addmath","pendidikanislam","psi","pqs","tasawur","arab","arabtinggi","arabkomunikasi","usulaldin","alsyariah","manahij","adab","hifz","maharat","lughah","turatharab","turathquran","turathdirasat"],n:1}
+  ],
+  "UD4221008":[
+    {t:"count",ids:["arab","arabtinggi","arabkomunikasi","lughah","turatharab","adab"],n:1},
+    {t:"count",ids:["math","addmath"],n:1},
+    {t:"all",ids:["sains"]},
+    {t:"count",ids:["pendidikanislam","psi","pqs","tasawur","usulaldin","alsyariah","manahij","hifz","maharat","turathquran","turathdirasat"],n:2}
+  ]
+};
+catalog.forEach(c=>{ if(PROGRAM_GATE_CORRECTIONS[c.code]) c.gates = PROGRAM_GATE_CORRECTIONS[c.code]; });
 
 // Data semasa menggunakan ID kanonik, tetapi alias ID lama dikekalkan secara tersembunyi
 // untuk keserasian dengan rule/keadaan lama. Alias ini tidak dipaparkan sebagai subjek berasingan.
@@ -498,6 +533,10 @@ function gateExplicitlyRequiresArabic(g){
 }
 
 function passesHardSubjectGuard(c,set){
+  // Asasi Teknologi Maklumat Huffaz UMK memerlukan hafazan Juzuk 1-5 dan temu duga.
+  // Hafazan bukan mata pelajaran SPM, jadi ia disahkan melalui pilihan khas pengguna.
+  if(c.code==="UL0481001" && !document.getElementById("huffazFlag")?.checked) return false;
+
   const hard=HARD_REQUIRED_SUBJECTS[c.code];
   if(hard && !hard.every(x=>subjectPresent(set,x))) return false;
 
@@ -534,7 +573,7 @@ const KSI_SUBJECTS = new Set([
 // Laluan merentas aliran tidak bergantung pada label pakej KSI/STEM.
 // Ia ditentukan oleh bukti syarat program: gate subjek rasmi atau status open-stream yang disahkan.
 function isReligiousSpecialistProgramme(c){
-  return /(syariah|pengajian islam|usuluddin|dakwah|al-quran|quran|tahfiz|bahasa arab|arabic|tamhidi)/i.test(c.name||"");
+  return /(syariah|pengajian islam|usuluddin|dakwah|al-quran|quran|tahfiz|huffaz|hafaz|bahasa arab|arabic|tamhidi)/i.test(c.name||"");
 }
 // v29 audit: 96/96 open-stream codes were rechecked against UPUMatch v5.2.1 eligibility_rules;
 // none contains a required non-core subject_min_grade / elective-specific subject rule.
@@ -544,7 +583,7 @@ function isReligiousSpecialistProgramme(c){
 // (a) mempunyai gate subjek khusus yang telah dipetakan (`subjectRuleVerified`), atau
 // (b) audit sumber semasa menunjukkan tiada elektif khusus yang wajib dan tiada semakan manual subjek/bahasa yang belum selesai.
 const VERIFIED_OPEN_STREAM_CODES = new Set(["FB4213003","FB4213005","FB4213006","FB4213007","FB4214001","FB4214003","FB4214004","FB4214005","FB4214006","FB4340002","FB4340003","FB4340004","FB4340005","FB4342001","FB4343001","FB4343002","FB4343003","FB4344001","FB4345001","FB4345002","FB4346001","FB4482001","FB4526003","FB4541001","FB4541002","FB4543001","FB4545001","FB4621001","FB4622001","FB4624001","FB4811001","FB4811003","FB4812001","FC3213001","FC3213002","FC3213003","FC3214002","FC3214003","FC3215001","FC3345001","FC3345002","FC3482002","FC3520001","FC3521001","FC3521002","FC3522001","FC3522002","FC3523001","FC3523002","FC3525001","FC3525002","FC3525003","FC3541001","FC3543001","FC3581001","FC3581002","FC3582001","FC3582002","FC3582003","FC3622001","FC3624001","FC3811002","FC3811003","FC3811004","FC3811005","FC3811006","FC3812001","FC3812003","FC3812004","FC3815001","FC3815002","FC4213001","FC4213002","FC4521001","FC4522001","FC4523001","FC4523002","FC4523003","FC4581001","FC4811001","UA4212001","UA4212002","UA4212003","UA4224001","UA4481002","UB4213001","UB4481001","UE4224001","UE4811001","UL0010002","UM0010001","UP4345001","UP4621001","UZ4340001","UZ4345001","UZ4813001"]);
-// v30: 38 daripada 96 program open-stream mempunyai semakan tambahan bukan-subjek
+// v30: 39 daripada 96 program open-stream mempunyai semakan tambahan bukan-subjek
 // (contohnya temu duga/portfolio, keupayaan fizikal, ujian khas, syarat umur atau kesihatan).
 // Status ini tidak menutup program, tetapi dipaparkan supaya "open-stream" tidak disalah baca sebagai "tiada syarat lain".
 const OPEN_STREAM_MANUAL_CHECK_CODES = new Set(["FB4214001","FB4214003","FB4214004","FB4214005","FB4214006","FB4340004","FB4482001","FC3213001","FC3213002","FC3213003","FC3214002","FC3215001","FC3345001","FC3482002","FC3581001","FC3581002","FC3811002","FC3811003","FC3811004","FC3811005","FC3811006","FC3815001","FC3815002","FC4523001","FC4523003","FC4581001","UA4212001","UA4212002","UA4212003","UA4224001","UA4481002","UB4213001","UB4481001","UE4224001","UL0010002","UZ4340001","UZ4345001","UZ4813001","UE4811001"]);
@@ -576,7 +615,18 @@ const MANUAL_CHECK_LABELS = {
   age_requirement:["Syarat umur","warn"],
   bumiputera_only:["Bumiputera","warn"]
 };
+function religionRequirementBadge(c){
+  const religiousIds=new Set([...ISLAMIC_SUBJECTS,...ARABIC_SUBJECTS,"adab"]);
+  const needs=(c.gates||[]).some(g=>{
+    if(g.t!=="count" && g.t!=="all") return false;
+    const ids=g.ids||[];
+    return ids.length>0 && ids.every(x=>religiousIds.has(x));
+  });
+  return needs?'<div class="checkBadges"><span class="checkBadge warn">Syarat subjek Islam / Arab</span></div>':"";
+}
+
 function manualCheckBadges(c){
+  if(c.code==="UL0481001") return '<div class="checkBadges"><span class="checkBadge warn">Hafazan Juzuk 1-5</span><span class="checkBadge info">Temu duga</span></div>';
   const checks=OPEN_STREAM_MANUAL_CHECK_DETAIL[c.code]||[];
   if(!checks.length) return "";
   const items=checks.map(ch=>{
@@ -762,7 +812,7 @@ function subjectProfile(sel){
   if(hasAny(s,[...ISLAMIC_SUBJECTS])){
     parts.push("Komponen Pengajian Islam dikesan; laluan yang mensyaratkannya boleh dipertimbangkan dari sudut kehadiran subjek.");
   } else {
-    parts.push("Jika anda mengambil Pendidikan Islam atau subjek Pengajian Islam, masukkan subjek itu juga kerana beberapa laluan UIAM/UniSZA memerlukannya.");
+    parts.push("Tiada subjek Pengajian Islam dikesan. Program yang benar-benar mewajibkan komponen Pengajian Islam akan disembunyikan; syarat Bahasa Arab dinilai secara berasingan.");
   }
 
   parts.push("Bahasa Melayu, Bahasa Inggeris, Matematik dan Sejarah dianggap hadir untuk semakan syarat teras. Padanan bidang langsung diutamakan, tetapi laluan merentas aliran turut dipaparkan apabila syarat kehadiran subjek yang telah dipetakan membenarkannya. Logik ini digunakan untuk semua program, bukan beberapa contoh kursus tertentu. Gred, merit dan syarat bukan akademik belum dinilai.");
@@ -785,6 +835,7 @@ function scoreCourse(c,sel){
 
 function matchReason(c,sel){
   const set=new Set(sel);
+  if(c.code==="UL0481001") return "Padanan bidang IT dikesan dan syarat khas hafazan Juzuk 1-5 telah ditandakan. Temu duga dan gred sebenar masih perlu disahkan.";
   const relHits=(c.rel||[]).filter(x=>subjectSelected(set,x)).length;
   if(relHits===0 && hasVerifiedNonCoreGateEvidence(c,set)){
     return "Laluan merentas aliran: sekurang-kurangnya satu elektif bukan-teras yang anda pilih terlibat secara langsung dalam gate subjek rasmi yang telah dipetakan. Gred sebenar masih perlu disemak.";
@@ -834,6 +885,7 @@ function matchCourses(){
       <div class="unis"><strong>Padanan subjek:</strong><br>${escapeHtml(matchReason(c,sel))}<div class="uniNote">Gred, merit dan syarat bukan akademik belum dinilai. Semak UPUMatch / e-Panduan UPU untuk kelayakan sebenar.</div></div>
       ${VERIFIED_OPEN_STREAM_CODES.has(c.code)?openStreamAcademicNote(c):""}
       ${gateEvidenceNote(c,sel)}
+      ${religionRequirementBadge(c)}
       ${manualCheckBadges(c)}
       <span class="match">Lepasi tapisan subjek</span>
     </article>`;
@@ -876,7 +928,7 @@ function renderFilters(matches){
   if(!matches || !matches.length){bar.innerHTML="";return;}
   const cats=[...new Set(matches.map(x=>x.cat))];
   bar.innerHTML=`<button class="filterBtn active" data-cat="Semua">Semua (${matches.length})</button>`+
-    cats.map(cat=>`<button class="filterBtn" data-cat="${cat}">${cat} (${matches.filter(x=>x.cat===cat).length})</button>`).join("");
+    cats.map(cat=>`<button class="filterBtn" data-cat="${escapeHtml(cat)}">${escapeHtml(cat)} (${matches.filter(x=>x.cat===cat).length})</button>`).join("");
   bar.querySelectorAll(".filterBtn").forEach(btn=>{
     btn.addEventListener("click",()=>{
       bar.querySelectorAll(".filterBtn").forEach(b=>b.classList.remove("active"));
@@ -897,13 +949,14 @@ function renderFilters(matches){
 
 function resetAll(){
   selected.clear();searchInput.value="";renderChips();renderOptions();
+  const hf=document.getElementById("huffazFlag"); if(hf) hf.checked=false;
   document.getElementById("filterBar").innerHTML="";
   document.getElementById("countText").textContent="";
   document.getElementById("courseGrid").innerHTML="";
   document.getElementById("result").style.display="none";
 }
 renderOptions();renderChips();
-window.SUBJEKMATCH_RELEASE={version:"final-locked-2026-09-17",status:"final-locked",auditSource:"UPUMatch v5.2.1",hardReadySource:358,autoPrograms:359,manualPrograms:4,totalPrograms:363,verifiedOpenStreamPrograms:96,openStreamManualChecks:39,qa:{critical:26,uiScenarios:4,monotonicity:30000,monotonicityFailures:0},focus:"final locked after last user-flow audit; stale result filters cleared on empty/reset states"};
+window.SUBJEKMATCH_RELEASE={version:"final-audit-2026-09-19",status:"audited",auditSource:"UPUMatch v5.2.1",hardReadySource:358,autoPrograms:359,manualPrograms:4,totalPrograms:363,verifiedOpenStreamPrograms:96,openStreamManualChecks:39,qa:{critical:26,uiScenarios:4,monotonicity:30000,monotonicityFailures:0},focus:"final audit: UniSZA CS/IT Add Math alternative aligned to 2026 official requirements; Media Penyiaran Islam strict gate retained; UMK Huffaz prerequisite retained; cross-stream category filter CSS fixed"};
 </script>
 </body>
 </html>
