@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SubjekMatch | Unit Bimbingan dan Kaunseling SMK Sungai Besar</title>
-<!-- v31 SMT 2026 alignment: STEM A/B/KSI + SMT-aware course grouping -->
 <style>
 :root{--bg:#fffaf0;--card:#fff;--ink:#10254b;--muted:#687386;--primary:#d99b00;--gold:#d99b00;--gold2:#f4c542;--navy:#10254b;--border:#eadfca}
 *{box-sizing:border-box}
@@ -153,7 +152,7 @@ footer{
   <div class="panelhead">
     <div>
       <h2>Pilih mata pelajaran</h2>
-      <div class="hint">Taip nama subjek untuk mencari. Tidak semua subjek perlu dipaparkan serentak.</div>
+      <div class="hint">Pilih sekurang-kurangnya 6 mata pelajaran yang anda ambil dalam SPM. Taip nama subjek untuk mencari.</div>
     </div>
   </div>
 
@@ -188,7 +187,7 @@ footer{
   <div class="profile">
     <small>SUBJEK PILIHAN ANDA</small>
     <h2 id="profileName">Kombinasi mata pelajaran anda</h2>
-    <div id="profileText">Padanan ditapis berdasarkan kombinasi subjek yang mencukupi.</div>
+    <div id="profileText">Padanan hanya diproses selepas sekurang-kurangnya 6 subjek dipilih.</div>
   </div>
 
   <div class="section-title">
@@ -209,14 +208,12 @@ footer{
 
 
 
-
-<div class="note" style="margin-top:18px"><strong>Nota SMT 2026:</strong> Pakej Kejuruteraan Awam, Elektrik & Elektronik dan Mekanikal dipetakan sebagai STEM B; Sains Pertanian sebagai STEM A; Perdagangan sebagai KSI. Bagi Perdagangan, kombinasi semasa yang digunakan dalam pengesanan ialah <strong>Sains + Prinsip Perakaunan + Pengajian Keusahawanan/Perniagaan</strong>. SubjekMatch menilai kehadiran subjek sahaja; gred, merit, temu duga dan syarat bukan akademik perlu disemak di UPUMatch/e-Panduan.</div>
 </main>
 
 <footer>
       <strong>SubjekMatch</strong><br>
       Dibangunkan oleh Unit Bimbingan dan Kaunseling, SMK Sungai Besar<br>
-      <span style="font-size:12px">Versi Audit Agama/Huffaz · 19 September 2026. Katalog semasa mengandungi 363 program Kategori A daripada pangkalan data UPUMatch. SubjekMatch menapis berdasarkan mata pelajaran yang diambil, bukan gred, merit, MUET, temu duga atau syarat bukan akademik. Hasil dibahagikan kepada Padanan Utama, laluan Berdasarkan Subjek Anda, dan Open-stream. Gate merentas aliran hanya dibuka apabila elektif bukan-teras calon benar-benar terlibat dalam gate yang dipetakan, manakala 96 program open-stream telah diaudit sebagai tidak menetapkan elektif bukan-teras tertentu. Empat rekod kekal manual/provisional dan tidak digunakan untuk keputusan automatik. Semakan kelayakan akhir hendaklah dibuat melalui e-Panduan UPU dan laman rasmi institusi.</span>
+      <span style="font-size:12px">Versi Audit Agama/Huffaz · 19 September 2026. Katalog semasa mengandungi 363 program Kategori A daripada pangkalan data UPUMatch. SubjekMatch menapis berdasarkan mata pelajaran yang diambil, bukan gred, merit, MUET, temu duga atau syarat bukan akademik. Minimum 6 subjek mesti dipilih sendiri oleh murid sebelum padanan diproses. Hasil dibahagikan kepada Padanan Utama, laluan Berdasarkan Subjek Anda, dan Open-stream. Gate merentas aliran hanya dibuka apabila elektif bukan-teras calon benar-benar terlibat dalam gate yang dipetakan, manakala 96 program open-stream telah diaudit sebagai tidak menetapkan elektif bukan-teras tertentu. Empat rekod kekal manual/provisional dan tidak digunakan untuk keputusan automatik. Semakan kelayakan akhir hendaklah dibuat melalui e-Panduan UPU dan laman rasmi institusi.</span>
     </footer>
 
 <script>
@@ -316,7 +313,7 @@ function subjectPresent(set,id){
 
 const byId = Object.fromEntries(subjects.map(s=>[s.id,s]));
 const selected = new Set();
-const commonIds = ["sains","bio","fizik","kimia","addmath","sainskomputer","pka","pkm","pkee","lukisankejuruteraan","pertanian","keusahawanan","perniagaan","akaun","ekonomi","pendidikanislam","pqs","psi","arab","hifz","maharat"];
+const commonIds = ["sains","bio","fizik","kimia","addmath","sainskomputer","pka","pkm","pkee","lukisankejuruteraan","pertanian","keusahawanan","pendidikanislam","pqs","psi","arab","hifz","maharat","akaun","ekonomi"];
 
 
 function norm(s){
@@ -763,81 +760,19 @@ function detectStemPackage(sel){
   return null;
 }
 
-// v31 SMT 2026: pemetaan pakej diselaraskan dengan maklumat TVET KPM semasa.
-// Tiga jurusan kejuruteraan = STEM B; Sains Pertanian = STEM A; Perdagangan = KSI.
-// Perdagangan semasa menggunakan Sains + Prinsip Perakaunan + Pengajian Keusahawanan ATAU Perniagaan,
-// BUKAN Fizik + Kimia + Matematik Tambahan.
-const SMT_PACKAGE_DEFS = [
-  {
-    code:"SMT_AWAM", label:"Pakej SMT Kejuruteraan Awam", stem:"B",
-    required:["pka","lukisankejuruteraan","fizik","kimia","addmath"],
-    anchors:["pka","bahanbinaan","teknologibinaan","pembinaandomestik","kerjapaip","lukisankejuruteraan"]
-  },
-  {
-    code:"SMT_EE", label:"Pakej SMT Kejuruteraan Elektrik & Elektronik", stem:"B",
-    required:["pkee","lukisankejuruteraan","fizik","kimia","addmath"],
-    anchors:["pkee","aplikasielektrikelektronik","pendawaian","lukisankejuruteraan"]
-  },
-  {
-    code:"SMT_MEK", label:"Pakej SMT Kejuruteraan Mekanikal", stem:"B",
-    required:["pkm","lukisankejuruteraan","fizik","kimia","addmath"],
-    anchors:["pkm","automotifkenderaan","automotifelektrikdiesel","kimpal","lukisankejuruteraan"]
-  },
-  {
-    code:"SMT_AGRI", label:"Pakej SMT Sains Pertanian", stem:"A",
-    required:["pertanian","bio","fizik","kimia","addmath"],
-    anchors:["pertanian","pengajianagroteknologi","pengeluarantanaman","pengurusanladang","kejenteraanladang","tanaman","landskap","akuakultur"]
-  },
-  {
-    code:"SMT_KSI", label:"Pakej SMT Perdagangan (KSI)", stem:"KSI",
-    required:["akaun","sains"], anyOf:["keusahawanan","perniagaan"],
-    anchors:["akaun","keusahawanan","perniagaan","perdagangan","aplikasikomputerperniagaan","ekonomi"]
-  }
-];
-
-function getSmtPackageInfo(sel){
-  const s=new Set(sel);
-  const present=id=>s.has(id);
-  const complete=d=>d.required.every(present) && (!(d.anyOf||[]).length || d.anyOf.some(present));
-
-  // Keutamaan pakej lengkap dahulu supaya label tidak tersasar apabila ada subjek tambahan.
-  const full=SMT_PACKAGE_DEFS.find(complete);
-  if(full) return {...full,complete:true,missing:[]};
-
-  // Pengenalpastian pakej separa berdasarkan subjek identiti jurusan.
-  const signatureOrder=[
-    ["SMT_AWAM","pka"],["SMT_EE","pkee"],["SMT_MEK","pkm"],["SMT_AGRI","pertanian"]
-  ];
-  for(const [code,id] of signatureOrder){
-    if(!s.has(id)) continue;
-    const d=SMT_PACKAGE_DEFS.find(x=>x.code===code);
-    const missing=d.required.filter(x=>!s.has(x));
-    return {...d,complete:false,missing};
-  }
-
-  // Perdagangan/KSI: akaun bersama Keusahawanan/Perniagaan ialah identiti utama;
-  // Sains diperlukan untuk melengkapkan pakej SMT semasa.
-  if(s.has("akaun") && (s.has("keusahawanan")||s.has("perniagaan"))){
-    const d=SMT_PACKAGE_DEFS.find(x=>x.code==="SMT_KSI");
-    const missing=d.required.filter(x=>!s.has(x));
-    if(!d.anyOf.some(x=>s.has(x))) missing.push("keusahawanan/perniagaan");
-    return {...d,complete:false,missing};
-  }
-  return null;
-}
-
 function detectSmtPackage(sel){
-  const p=getSmtPackageInfo(sel);
-  if(!p) return "";
-  if(p.complete) return p.label;
-  const names=p.missing.map(id=>id==="keusahawanan/perniagaan"?"Pengajian Keusahawanan / Perniagaan":(byId[id]?.name||id));
-  return `${p.label} dikesan (pakej belum lengkap${names.length?`: tambah ${names.join(" + ")}`:""})`;
-}
+  const s=new Set(sel);
+  const hasAll=ids=>ids.every(x=>s.has(x));
+  if(hasAll(["pka","lukisankejuruteraan","fizik","kimia","addmath"])) return "Pakej SMT Kejuruteraan Awam";
+  if(hasAll(["pkee","lukisankejuruteraan","fizik","kimia","addmath"])) return "Pakej SMT Kejuruteraan Elektrik & Elektronik";
+  if(hasAll(["pkm","lukisankejuruteraan","fizik","kimia","addmath"])) return "Pakej SMT Kejuruteraan Mekanikal";
+  if(hasAll(["pertanian","bio","fizik","kimia","addmath"])) return "Pakej SMT Sains Pertanian";
+  if(hasAll(["keusahawanan","akaun","fizik","kimia","addmath"])) return "Pakej SMT Perdagangan";
 
-function isSmtPrimaryMatch(c,sel){
-  const p=getSmtPackageInfo(sel);
-  if(!p?.complete) return false;
-  return (c.rel||[]).some(id=>(p.anchors||[]).includes(id));
+  if(s.has("pka")) return "Subjek teknikal Kejuruteraan Awam SMT dikesan (pakej belum lengkap)";
+  if(s.has("pkee")) return "Subjek teknikal Kejuruteraan Elektrik & Elektronik SMT dikesan (pakej belum lengkap)";
+  if(s.has("pkm")) return "Subjek teknikal Kejuruteraan Mekanikal SMT dikesan (pakej belum lengkap)";
+  return "";
 }
 
 function subjectProfile(sel){
@@ -848,11 +783,6 @@ function subjectProfile(sel){
 
   if(stem) parts.push(`${stem.label} dikesan (${stem.detail}).`);
   if(smt) parts.push(`${smt}.`);
-  const smtInfo=getSmtPackageInfo(sel);
-  if(smtInfo?.complete){
-    const mapLabel=smtInfo.stem==="A"?"STEM A":(smtInfo.stem==="B"?"STEM B":"KSI");
-    parts.push(`Laluan SMT ini dipetakan sebagai ${mapLabel}; padanan utama akan mengutamakan program yang selari dengan jurusan ini, manakala program lain yang masih melepasi tapisan subjek dipaparkan sebagai laluan tambahan.`);
-  }
 
   const fullScience=["bio","fizik","kimia","addmath"].every(x=>s.has(x));
   const physicalScience=["fizik","kimia","addmath"].every(x=>s.has(x));
@@ -924,14 +854,16 @@ function escapeHtml(v){
 
 function matchCourses(){
   const sel=[...selected];
+  const MIN_SUBJECTS = 6;
   document.getElementById("result").style.display="block";
   const grid=document.getElementById("courseGrid");
-  if(!sel.length){
-    document.getElementById("profileName").textContent="Belum ada subjek dipilih";
-    document.getElementById("profileText").textContent="Pilih sekurang-kurangnya satu mata pelajaran.";
+  if(sel.length < MIN_SUBJECTS){
+    const baki = MIN_SUBJECTS - sel.length;
+    document.getElementById("profileName").textContent=sel.length ? `${sel.length} subjek dipilih` : "Belum ada subjek dipilih";
+    document.getElementById("profileText").textContent=`Sila pilih sekurang-kurangnya ${MIN_SUBJECTS} mata pelajaran yang anda ambil dalam SPM untuk mendapatkan padanan yang lebih tepat.${sel.length ? ` Tambah ${baki} lagi subjek.` : ""}`;
     document.getElementById("countText").textContent="";
     document.getElementById("filterBar").innerHTML="";
-    grid.innerHTML='<div class="empty">Tiada padanan untuk dipaparkan.</div>';
+    grid.innerHTML=`<div class="empty">Semakan belum dijalankan. Minimum ${MIN_SUBJECTS} subjek perlu dipilih sendiri oleh murid.</div>`;
     document.getElementById("result").scrollIntoView({behavior:"smooth"});
     return;
   }
@@ -939,32 +871,14 @@ function matchCourses(){
   document.getElementById("profileText").textContent=subjectProfile(sel);
   const matches=catalog.map(c=>({...c,score:scoreCourse(c,sel)})).filter(c=>c.score>0).sort((a,b)=>b.score-a.score || a.name.localeCompare(b.name,"ms"));
   const set=new Set(sel);
-  const smtInfo=getSmtPackageInfo(sel);
-  const direct=matches.filter(c=>(c.rel||[]).some(x=>subjectSelected(set,x)));
-  let primary,secondary,cross;
-
-  if(smtInfo?.complete){
-    // Untuk pakej SMT lengkap, "padanan utama" bermaksud benar-benar selari dengan jurusan,
-    // bukan sekadar terkena subjek umum seperti Sains/Fizik.
-    primary=matches.filter(c=>isSmtPrimaryMatch(c,sel));
-    const primaryCodes=new Set(primary.map(c=>c.code));
-    secondary=direct.filter(c=>!primaryCodes.has(c.code));
-    const directCodes=new Set(direct.map(c=>c.code));
-    cross=matches.filter(c=>!directCodes.has(c.code));
-  }else{
-    primary=direct;
-    secondary=[];
-    cross=matches.filter(c=>!(c.rel||[]).some(x=>subjectSelected(set,x)));
-  }
-
-  // Bezakan dua sebab cross-stream supaya murid tidak membaca semua laluan tambahan
+  const primary=matches.filter(c=>(c.rel||[]).some(x=>subjectSelected(set,x)));
+  const cross=matches.filter(c=>!(c.rel||[]).some(x=>subjectSelected(set,x)));
+  // v29: bezakan dua sebab cross-stream supaya murid tidak membaca semua laluan tambahan
   // sebagai padanan bidang yang sama kuat. `gateCross` menggunakan elektif calon dalam gate rasmi;
   // `openCross` ialah program yang audit sumbernya tidak menetapkan elektif bukan-teras tertentu.
   const gateCross=cross.filter(c=>hasVerifiedNonCoreGateEvidence(c,set));
   const openCross=cross.filter(c=>!hasVerifiedNonCoreGateEvidence(c,set) && isCrossStreamGeneral(c));
-  document.getElementById("countText").textContent=smtInfo?.complete
-    ? `${matches.length} program melepasi tapisan subjek · ${primary.length} laluan utama SMT · ${secondary.length} laluan tambahan · ${cross.length} merentas aliran`
-    : `${matches.length} program melepasi tapisan subjek · ${primary.length} padanan utama · ${gateCross.length} berdasarkan subjek · ${openCross.length} open-stream`;
+  document.getElementById("countText").textContent=`${matches.length} program melepasi tapisan subjek · ${primary.length} padanan utama · ${gateCross.length} berdasarkan subjek · ${openCross.length} open-stream`;
   const card=c=>`
     <article class="course" data-cat="${escapeHtml(c.cat)}">
       <div class="cat">${escapeHtml(c.cat)}</div>
@@ -978,19 +892,10 @@ function matchCourses(){
       <span class="match">Lepasi tapisan subjek</span>
     </article>`;
   if(matches.length){
-    if(smtInfo?.complete){
-      grid.innerHTML=`<div class="resultSectionTitle"><strong>Laluan Utama SMT</strong><span>${primary.length} program paling selari dengan ${escapeHtml(smtInfo.label)}</span></div>`+
-        (primary.length?primary.map(card).join(""):'<div class="empty">Tiada program jurusan utama dikesan daripada katalog semasa.</div>')+
-        `<div class="resultSectionTitle cross"><strong>Laluan Tambahan Berdasarkan Subjek</strong><span>${secondary.length} program lain yang masih relevan dan melepasi tapisan kehadiran subjek.</span></div>`+
-        (secondary.length?secondary.map(card).join(""):'<div class="empty">Tiada laluan tambahan berasaskan subjek.</div>')+
-        `<div class="resultSectionTitle cross"><strong>Laluan Merentas Aliran</strong><span>${cross.length} program tambahan berdasarkan gate rasmi atau status open-stream yang telah diaudit.</span></div>`+
-        (cross.length?renderCrossGroups(gateCross,openCross,card):'<div class="empty">Tiada laluan merentas aliran tambahan dikesan.</div>');
-    }else{
-      grid.innerHTML=`<div class="resultSectionTitle"><strong>Padanan Utama</strong><span>${primary.length} program yang paling berkaitan dengan subjek elektif anda</span></div>`+
-        (primary.length?primary.map(card).join(""):'<div class="empty">Tiada padanan bidang langsung dikesan.</div>')+
-        `<div class="resultSectionTitle cross"><strong>Laluan Merentas Aliran</strong><span>${cross.length} program tambahan. Dipisahkan mengikut kekuatan bukti subjek supaya lebih mudah dibaca.</span></div>`+
-        (cross.length?renderCrossGroups(gateCross,openCross,card):'<div class="empty">Tiada laluan merentas aliran tambahan dikesan.</div>');
-    }
+    grid.innerHTML=`<div class="resultSectionTitle"><strong>Padanan Utama</strong><span>${primary.length} program yang paling berkaitan dengan subjek elektif anda</span></div>`+
+      (primary.length?primary.map(card).join(""):'<div class="empty">Tiada padanan bidang langsung dikesan.</div>')+
+      `<div class="resultSectionTitle cross"><strong>Laluan Merentas Aliran</strong><span>${cross.length} program tambahan. Dipisahkan mengikut kekuatan bukti subjek supaya lebih mudah dibaca.</span></div>`+
+      (cross.length?renderCrossGroups(gateCross,openCross,card):'<div class="empty">Tiada laluan merentas aliran tambahan dikesan.</div>');
   }else{
     grid.innerHTML='<div class="empty"><strong>Tiada program melepasi tapisan.</strong><br>Program yang tidak memenuhi kombinasi subjek telah disembunyikan. Cuba tambah semua subjek elektif yang anda ambil.</div>';
   }
